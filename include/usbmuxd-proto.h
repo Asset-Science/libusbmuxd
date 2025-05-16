@@ -26,10 +26,16 @@
 #include <stdint.h>
 #define USBMUXD_PROTOCOL_VERSION 0
 
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(WIN32) || defined(__CYGWIN__)
 #define USBMUXD_SOCKET_PORT 27015
 #else
 #define USBMUXD_SOCKET_FILE "/var/run/usbmuxd"
+#endif
+
+#ifndef _MSC_VER
+#define PACK( __Declaration__ ) __Declaration__)
+#else
+#define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop) )
 #endif
 
 #ifdef __cplusplus
@@ -57,40 +63,36 @@ enum usbmuxd_msgtype {
 	MESSAGE_PLIST = 8,
 };
 
-#pragma pack(push, 1)
-
-struct usbmuxd_header {
+PACK(struct usbmuxd_header {
 	uint32_t length;    // length of message, including header
 	uint32_t version;   // protocol version
 	uint32_t message;   // message type
 	uint32_t tag;       // responses to this query will echo back this tag
-};
+});
 
-struct usbmuxd_result_msg {
+PACK(struct usbmuxd_result_msg {
 	struct usbmuxd_header header;
 	uint32_t result;
-};
+});
 
-struct usbmuxd_connect_request {
+PACK(struct usbmuxd_connect_request {
 	struct usbmuxd_header header;
 	uint32_t device_id;
 	uint16_t port;   // TCP port number
 	uint16_t reserved;   // set to zero
-};
+});
 
-struct usbmuxd_listen_request {
+PACK(struct usbmuxd_listen_request {
 	struct usbmuxd_header header;
-};
+});
 
-struct usbmuxd_device_record {
+PACK(struct usbmuxd_device_record {
 	uint32_t device_id;
 	uint16_t product_id;
 	char serial_number[256];
 	uint16_t padding;
 	uint32_t location;
-};
-
-#pragma pack(pop)
+});
 
 #ifdef __cplusplus
 }
