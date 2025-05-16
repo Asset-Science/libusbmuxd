@@ -23,6 +23,7 @@
 #ifndef USBMUXD_H
 #define USBMUXD_H
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -155,7 +156,7 @@ USBMUXD_API int usbmuxd_unsubscribe(void);
  * @return number of attached devices, zero on no devices, or negative
  *   if an error occured.
  */
-USBMUXD_API int usbmuxd_get_device_list(usbmuxd_device_info_t **device_list);
+USBMUXD_API int usbmuxd_get_device_list(usbmuxd_device_info_t **device_list, bool *stop);
 
 /**
  * Frees the device list returned by an usbmuxd_get_device_list call
@@ -182,7 +183,7 @@ USBMUXD_API int usbmuxd_device_list_free(usbmuxd_device_info_t **device_list);
  * @return 0 if no matching device is connected, 1 if the device was found,
  *    or a negative value on error.
  */
-USBMUXD_API int usbmuxd_get_device_by_udid(const char *udid, usbmuxd_device_info_t *device);
+USBMUXD_API int usbmuxd_get_device_by_udid(const char *udid, usbmuxd_device_info_t *device, bool *stop);
 
 /**
  * Looks up the device specified by UDID with given options and returns
@@ -207,7 +208,7 @@ USBMUXD_API int usbmuxd_get_device_by_udid(const char *udid, usbmuxd_device_info
  * @return 0 if no matching device is connected, 1 if the device was found,
  *    or a negative value on error.
  */
-USBMUXD_API int usbmuxd_get_device(const char *udid, usbmuxd_device_info_t *device, enum usbmux_lookup_options options);
+USBMUXD_API int usbmuxd_get_device(const char *udid, usbmuxd_device_info_t *device, enum usbmux_lookup_options options, bool* stop);
 
 /**
  * Request proxy connection to the specified device and port.
@@ -334,6 +335,7 @@ USBMUXD_API void libusbmuxd_set_use_inotify(int set);
 
 USBMUXD_API void libusbmuxd_set_debug_level(int level);
 
+USBMUXD_API void libusbmuxd_shutdown_monitor_thread();
 /**
  * Returns a static string of the libusbmuxd version.
  *

@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#define PACKAGE_VERSION "1.3.1"
 
 #ifdef LIBUSBMUXD_STATIC
   #define USBMUXD_API
@@ -1464,7 +1465,7 @@ int usbmuxd_get_device_by_udid(const char *udid, usbmuxd_device_info_t *device)
 	return result;
 }
 
-int usbmuxd_get_device(const char *udid, usbmuxd_device_info_t *device, enum usbmux_lookup_options options)
+int usbmuxd_get_device(const char *udid, usbmuxd_device_info_t *device, enum usbmux_lookup_options options, bool* stop)
 {
 	usbmuxd_device_info_t *dev_list = NULL;
 	usbmuxd_device_info_t *dev_network = NULL;
@@ -1795,17 +1796,32 @@ int usbmuxd_delete_pair_record(const char* record_id)
 	return ret;
 }
 
-void libusbmuxd_set_use_inotify(int set)
+USBMUXD_API void libusbmuxd_set_use_inotify(int set)
 {
 #ifdef HAVE_INOTIFY
 	use_inotify = set;
 #endif
 }
 
-void libusbmuxd_set_debug_level(int level)
+USBMUXD_API void libusbmuxd_set_debug_level(int level)
 {
 	libusbmuxd_debug = level;
 	socket_set_verbose(level);
+}
+
+USBMUXD_API void libusbmuxd_shutdown_monitor_thread()
+{
+	if (thread_alive(devmon)) {
+		if (thread_cancel(devmon) < 0) {
+			running = 0;
+		}
+#if defined(HAVE_INOTIFY) && !defined(HAVE_PTHREAD_CANCEL)
+		pthread_kill(devmon, SIGINT);
+#endif
+		thread_join(devmon);
+		thread_free(devmon);
+		devmon = THREAD_T_NULL;
+	}
 }
 
 const char* libusbmuxd_version()

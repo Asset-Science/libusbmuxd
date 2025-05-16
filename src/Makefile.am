@@ -8,7 +8,7 @@ libusbmuxd_2_0_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LIBUSBMUXD_SO_VERSION)
 libusbmuxd_2_0_la_LIBADD =
 libusbmuxd_2_0_la_SOURCES = libusbmuxd.c
 
-if WIN32
+if _WIN32
 libusbmuxd_2_0_la_LDFLAGS += -avoid-version -static-libgcc
 libusbmuxd_2_0_la_LIBADD += -lws2_32 -lIphlpapi
 endif
