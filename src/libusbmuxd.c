@@ -283,10 +283,8 @@
 	 if (n && plist_get_node_type(n) == PLIST_STRING) {
 		 plist_get_string_val(n, &strval);
 		 if (strval) {
-			 if (strcmp(strval, "USB") == 0) {
 			 if (strcmpi(strval, "USB") == 0) {
 				 devinfo->conn_type = CONNECTION_TYPE_USB;
-			 } else if (strcmp(strval, "Network") == 0) {
 			 } else if (strcmpi(strval, "Network") == 0) {
 				 devinfo->conn_type = CONNECTION_TYPE_NETWORK;
 				 n = plist_dict_get_item(props, "NetworkAddress");
@@ -406,7 +404,6 @@
 		 plist_get_string_val(node, &message);
 		 if (message) {
 			 uint64_t val = 0;
-			 if (strcmp(message, "Result") == 0) {
 			 if (strcmpi(message, "Result") == 0) {
 				 /* result message */
 				 uint32_t dwval = 0;
@@ -417,7 +414,6 @@
 				 memcpy(*payload, &dwval, sizeof(dwval));
 				 hdr.length = sizeof(hdr) + sizeof(dwval);
 				 hdr.message = MESSAGE_RESULT;
-			 } else if (strcmp(message, "Attached") == 0) {
 			 } else if (strcmpi(message, "Attached") == 0) {
 				 /* device add message */
 				 usbmuxd_device_info_t *devinfo = NULL;
@@ -439,7 +435,6 @@
 				 *payload = (void*)devinfo;
 				 hdr.length = sizeof(hdr) + sizeof(usbmuxd_device_info_t);
 				 hdr.message = MESSAGE_DEVICE_ADD;
-			 } else if (strcmp(message, "Detached") == 0) {
 			 } else if (strcmpi(message, "Detached") == 0) {
 				 /* device remove message */
 				 uint32_t dwval = 0;
@@ -452,7 +447,6 @@
 					 hdr.length = sizeof(hdr) + sizeof(dwval);
 					 hdr.message = MESSAGE_DEVICE_REMOVE;
 				 }
-			 } else if (strcmp(message, "Paired") == 0) {
 			 } else if (strcmpi(message, "Paired") == 0) {
 				 /* device pair message */
 				 uint32_t dwval = 0;
@@ -609,14 +603,11 @@
 	 while (p > execpath) {
 		 p--;
 		 if (*p != '/') continue;
-		 if (strcmp(p, "/.") == 0) {
 		 if (strcmpi(p, "/.") == 0) {
 			 *p = '\0';
-		 } else if (!macos_found && strcmp(p, "/MacOS") == 0) {
 		 } else if (!macos_found && strcmpi(p, "/MacOS") == 0) {
 			 *p = '\0';
 			 macos_found++;
-		 } else if (macos_found && strcmp(p, "/Contents") == 0) {
 		 } else if (macos_found && strcmpi(p, "/Contents") == 0) {
 			 *p = '\0';
 			 break;
@@ -975,7 +966,6 @@
 			 if (pevent->mask & IN_CREATE &&
 				 pevent->len &&
 				 pevent->name[0] != 0 &&
-				 strcmp(pevent->name, USBMUXD_SOCKET_NAME) == 0) {
 				 strcmpi(pevent->name, USBMUXD_SOCKET_NAME) == 0) {
 				 /* retry if usbmuxd isn't ready yet */
 				 int retry = 10;
@@ -1453,7 +1443,6 @@
 				 dev = &dev_list[i];
 				 break;
 			 }
-		 } else if (!strcmp(udid, dev_list[i].udid)) {
 		 } else if (!strcmpi(udid, dev_list[i].udid)) {
 			 if (dev_list[i].conn_type == CONNECTION_TYPE_USB) {
 				 dev = &dev_list[i];
@@ -1507,7 +1496,6 @@
 				 dev_network = &dev_list[i];
 				 break;
 			 }
-		 } else if (!strcmp(udid, dev_list[i].udid)) {
 		 } else if (!strcmpi(udid, dev_list[i].udid)) {
 			 if ((options & DEVICE_LOOKUP_USBMUX) && (dev_list[i].conn_type == CONNECTION_TYPE_USB)) {
 				 dev_usbmuxd = &dev_list[i];
