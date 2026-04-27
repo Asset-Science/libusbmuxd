@@ -94,6 +94,10 @@
  
  #ifdef _MSC_VER
  #define strcasecmp _stricmp
+ #else
+ // POSIX has `strdup`; MSVC has the leading-underscore `_strdup`. Alias the
+ // MSVC name to the POSIX one on non-MSVC so the existing call sites work.
+ #define _strdup strdup
  #endif
  
  #include <plist/plist.h>
