@@ -88,11 +88,11 @@ static void *acceptor_thread(void *arg)
 	}
 
 	if (cdata->udid) {
-		if (usbmuxd_get_device(cdata->udid, &muxdev, cdata->lookup_opts) > 0) {
+		if (usbmuxd_get_device(cdata->udid, &muxdev, cdata->lookup_opts, NULL) > 0) {
 			dev = &muxdev;
 		}
 	} else {
-		if ((count = usbmuxd_get_device_list(&dev_list)) < 0) {
+		if ((count = usbmuxd_get_device_list(&dev_list, NULL)) < 0) {
 			printf("Connecting to usbmuxd failed, terminating.\n");
 			free(dev_list);
 			CDATA_FREE(cdata);
