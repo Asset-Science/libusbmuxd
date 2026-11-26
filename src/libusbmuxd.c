@@ -62,6 +62,9 @@
  #include <signal.h>
  #include <sys/socket.h>
  #include <arpa/inet.h>
+ // POSIX equivalent of Microsoft's `strcmpi` / `_strcmpi`. The call sites
+ // throughout this file use the bare `strcmpi` name unconditionally.
+ #define strcmpi strcasecmp
  #if defined(HAVE_PROGRAM_INVOCATION_SHORT_NAME) && !defined(HAVE_PROGRAM_INVOCATION_SHORT_NAME_ERRNO_H)
  extern char *program_invocation_short_name;
  #endif
@@ -94,6 +97,10 @@
  
  #ifdef _MSC_VER
  #define strcasecmp _stricmp
+ #else
+ // POSIX has `strdup`; MSVC has the leading-underscore `_strdup`. Alias the
+ // MSVC name to the POSIX one on non-MSVC so the existing call sites work.
+ #define _strdup strdup
  #endif
  
  #include <plist/plist.h>
@@ -1274,7 +1281,7 @@
 	 return res;
  }
  
- int usbmuxd_get_device_list(usbmuxd_device_info_t **device_list)
+ int usbmuxd_get_device_list(usbmuxd_device_info_t **device_list, bool *stop)
  {
 	 int sfd;
 	 int tag;
@@ -1285,7 +1292,12 @@
 	 struct usbmuxd_header hdr;
 	 int dev_cnt = 0;
 	 void *payload = NULL;
- 
+
+	 // `stop` is the cancellation signal exposed by the public header. The
+	 // implementation here is short-running enough that we don't poll it
+	 // mid-operation; suppress the unused-parameter warning.
+	 (void)stop;
+
 	 *device_list = NULL;
  
  retry:
@@ -1423,7 +1435,7 @@
 	 return 0;
  }
  
- int usbmuxd_get_device_by_udid(const char *udid, usbmuxd_device_info_t *device)
+ int usbmuxd_get_device_by_udid(const char *udid, usbmuxd_device_info_t *device, bool *stop)
  {
 	 usbmuxd_device_info_t *dev_list = NULL;
 	 usbmuxd_device_info_t *dev = NULL;
@@ -1433,7 +1445,7 @@
 	 if (!device) {
 		 return -EINVAL;
 	 }
-	 if (usbmuxd_get_device_list(&dev_list) < 0) {
+	 if (usbmuxd_get_device_list(&dev_list, stop) < 0) {
 		 return -ENODEV;
 	 }
  
@@ -1478,7 +1490,7 @@
 	 if (!device) {
 		 return -EINVAL;
 	 }
-	 if (usbmuxd_get_device_list(&dev_list) < 0) {
+	 if (usbmuxd_get_device_list(&dev_list, stop) < 0) {
 		 return -ENODEV;
 	 }
  

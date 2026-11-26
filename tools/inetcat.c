@@ -186,12 +186,12 @@ int main(int argc, char **argv)
     usbmuxd_device_info_t muxdev;
 
     if (device_udid) {
-        if (usbmuxd_get_device(device_udid, &muxdev, lookup_opts) > 0) {
+        if (usbmuxd_get_device(device_udid, &muxdev, lookup_opts, NULL) > 0) {
             dev = &muxdev;
         }
     } else {
         int count;
-        if ((count = usbmuxd_get_device_list(&dev_list)) < 0) {
+        if ((count = usbmuxd_get_device_list(&dev_list, NULL)) < 0) {
             printf("Connecting to usbmuxd failed, terminating.\n");
             free(dev_list);
             return 1;
